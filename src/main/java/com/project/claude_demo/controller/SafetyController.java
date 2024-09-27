@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/safety")
@@ -20,10 +21,15 @@ public class SafetyController {
         this.safetyService = safetyService;
     }
 
-    @GetMapping("/weather-safety-tip")
-    public ResponseEntity<String> getWeatherSafetyTip(@RequestParam String location) {
-        return ResponseEntity.ok(safetyService.getWeatherSafetyTip(location));
-    }
+//    @GetMapping("/weather-safety-tip")
+//    public ResponseEntity<String> getWeatherSafetyTip(@RequestParam String location) {
+//        return ResponseEntity.ok(safetyService.getWeatherSafetyTip(location));
+//    }
+
+@GetMapping("/weather-details")
+public ResponseEntity<Map<String, Object>> getWeatherDetails(@RequestParam String location) {
+    return ResponseEntity.ok(safetyService.getWeatherDetails(location));
+}
 
     @GetMapping("/nearby-police-stations")
     public ResponseEntity<List<String>> getNearbyPoliceStations(@RequestParam double lat, @RequestParam double lon) {

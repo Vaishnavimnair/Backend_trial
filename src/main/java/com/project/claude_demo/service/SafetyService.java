@@ -22,10 +22,31 @@ public class SafetyService {
         this.weatherUtil = weatherUtil;
         this.restTemplate = restTemplate;
     }
-
-    public String getWeatherSafetyTip(String location) {
+    public Map<String, Object> getWeatherDetails(String location) {
         try {
             Map<String, Object> weatherData = weatherUtil.getWeatherForLocation(location);
+            Map<String, Object> mainData = (Map<String, Object>) weatherData.get("main");
+            Map<String, Object> windData = (Map<String, Object>) weatherData.get("wind");
+            List<Map<String, Object>> weatherList = (List<Map<String, Object>>) weatherData.get("weather");
+
+            Map<String, Object> result = new java.util.HashMap<>();
+            result.put("temperature", mainData.get("temp"));
+            result.put("humidity", mainData.get("humidity"));
+            result.put("windSpeed", windData.get("speed"));
+            result.put("description", weatherList.get(0).get("description"));
+            result.put("safetyTip", getWeatherSafetyTip(weatherData));
+
+            return result;
+        } catch (RuntimeException e) {
+            logger.error("Error in getWeatherDetails", e);
+            throw new RuntimeException("Unable to fetch weather data: " + e.getMessage());
+        }
+    }
+
+    //public String getWeatherSafetyTip(String location) {
+       // try {
+    private String getWeatherSafetyTip(Map<String, Object> weatherData) {
+            //Map<String, Object> weatherData = weatherUtil.getWeatherForLocation(location);
             List<Map<String, Object>> weatherList = (List<Map<String, Object>>) weatherData.get("weather");
             String mainWeather = (String) weatherList.get(0).get("main");
             Map<String, Object> mainData = (Map<String, Object>) weatherData.get("main");
@@ -49,10 +70,10 @@ public class SafetyService {
                 default:
                     return "General safety tip: Always be aware of your surroundings and trust your instincts.";
             }
-        } catch (RuntimeException e) {
-            logger.error("Error in getWeatherSafetyTip", e);
-            return "Unable to fetch weather data: " + e.getMessage();
-        }
+//        } catch (RuntimeException e) {
+//            logger.error("Error in getWeatherSafetyTip", e);
+//            return "Unable to fetch weather data: " + e.getMessage();
+//        }
     }
 
 public List<String> getNearbyPoliceStations(double lat, double lon) {
